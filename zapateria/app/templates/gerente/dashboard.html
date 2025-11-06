@@ -1,0 +1,58 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Dashboard Gerente - Zapatería{% endblock %}
+
+{% block content %}
+<div class="gerente-dashboard" style="max-width: 1200px; margin: 2rem auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Dashboard de Gerente</h1>
+    <a href="{% url 'profile' %}" class="btn btn-outline">Volver al Perfil</a>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="stat-card" style="background: #e3f2fd; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #1976d2;">
+      <h3 style="margin: 0 0 0.5rem 0; color: #1976d2;">Productos</h3>
+      <p style="font-size: 2rem; margin: 0; font-weight: bold;color: #000000;">{{ total_products }}</p>
+      <p style="margin: 0.5rem 0 0 0; color: #666;">Total en catálogo</p>
+    </div>
+
+    <div class="stat-card" style="background: #e8f5e9; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+      <h3 style="margin: 0 0 0.5rem 0; color: #4caf50;">Órdenes Completadas</h3>
+      <p style="font-size: 2rem; margin: 0; font-weight: bold;color: #000000;">{{ total_orders }}</p>
+      <p style="margin: 0.5rem 0 0 0; color: #666;">Total procesadas</p>
+    </div>
+
+    <div class="stat-card" style="background: #fff3e0; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+      <h3 style="margin: 0 0 0.5rem 0; color: #ff9800;">Órdenes Pendientes</h3>
+      <p style="font-size: 2rem; margin: 0; font-weight: bold;color: #000000;">{{ pending_orders }}</p>
+      <p style="margin: 0.5rem 0 0 0; color: #666;">Por procesar</p>
+    </div>
+
+    <div class="stat-card" style="background: #ffebee; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #f44336;">
+      <h3 style="margin: 0 0 0.5rem 0; color: #f44336;">Stock Bajo</h3>
+      <p style="font-size: 2rem; margin: 0; font-weight: bold;color: #000000;">{{ low_stock }}</p>
+      <p style="margin: 0.5rem 0 0 0; color: #666;">Productos con menos de 5 unidades</p>
+    </div>
+  </div>
+
+  <!-- Acciones rápidas -->
+  <div class="quick-actions" style="margin-top: 2rem;">
+    <h2>Acciones Rápidas</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+      <a href="{% url 'gerente_products_list' %}" class="btn" style="text-align: center; padding: 1.5rem;">
+        Ver Todos los Productos
+      </a>
+      <a href="{% url 'gerente_product_add' %}" class="btn" style="text-align: center; padding: 1.5rem;">
+        Agregar Nuevo Producto
+      </a>
+      <a href="{% url 'gerente_orders_list' %}" class="btn btn-outline" style="text-align: center; padding: 1.5rem;">
+        Ver Todas las Órdenes
+      </a>
+      <a href="{% url 'gerente_orders_list' %}?status=pending" class="btn btn-outline" style="text-align: center; padding: 1.5rem;">
+        Ver Órdenes Pendientes
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

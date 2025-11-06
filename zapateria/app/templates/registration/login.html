@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Iniciar sesión | Zapatería</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="{% url 'store' %}" class="brand">Zapatería</a>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags|default:'info' }}">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <h1 style="margin-bottom:1rem">Iniciar sesión</h1>
+
+    <form method="post" class="form" action="{% url 'login' %}">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div>
+        <label>Usuario</label>
+        {{ form.username}}
+      </div>
+      <div>
+        <label>Contraseña</label>
+        {{ form.password}}
+      </div>
+
+      {% if next %}
+        <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      <button class="btn" type="submit">Entrar</button>
+      <a class="btn btn-outline" href="{% url 'store' %}">Cancelar</a>
+    </form>
+
+     <div style="margin-top: 1.5rem; text-align: center;">
+        <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <p style="margin-top:1rem">
+      ¿No tienes cuenta?
+      <a href="{% url 'register' %}">Registrarme</a>
+    </p>
+  </main>
+</body>
+</html>

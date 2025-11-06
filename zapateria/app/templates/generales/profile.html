@@ -1,0 +1,74 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Mi Perfil - Zapatería{% endblock %}
+
+{% block content %}
+<div class="profile-container" style="max-width: 1000px; margin: 2rem auto;">
+  <h1>Mi Perfil</h1>
+
+  <div class="profile-info" style="background: #f9f9f9; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;color: #1976d2;">
+    <h2>Información de Usuario</h2>
+    <p><strong>Usuario:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    {% if user.is_superuser %}
+      <p><strong>Rol:</strong> <span class="badge" style="background: #d32f2f;">Superusuario</span></p>
+    {% elif is_gerente %}
+      <p><strong>Rol:</strong> <span class="badge" style="background: #1976d2;">Gerente</span></p>
+    {% else %}
+      <p><strong>Rol:</strong> <span class="badge">Cliente</span></p>
+    {% endif %}
+  </div>
+
+  <!-- Acceso al menú de gerente -->
+  {% if is_gerente or user.is_superuser %}
+    <div class="gerente-access" style="background: #e3f2fd; padding: 2rem; border-radius: 8px; margin-bottom: 2rem; border: 2px solid #1976d2;">
+      <h2 style="color: #1976d2;">Panel de Gerente</h2>
+      <p style="color: #333;">Tienes acceso al panel de gestión. Desde aquí puedes administrar productos y órdenes.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <a href="{% url 'gerente_dashboard' %}" class="btn" style="text-align: center; padding: 1rem;">
+          Dashboard
+        </a>
+        <a href="{% url 'gerente_products_list' %}" class="btn btn-outline" style="text-align: center; padding: 1rem;color: #666;">
+          Gestionar Productos
+        </a>
+        <a href="{% url 'gerente_orders_list' %}" class="btn btn-outline" style="text-align: center; padding: 1rem;color: #666;">
+          Gestionar Órdenes
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Mis pedidos -->
+  {% if customer %}
+    <div class="my-orders" style="margin-top: 2rem;">
+      <h2>Mis Pedidos</h2>
+
+      {% if orders %}
+        <div class="orders-list" style="margin-top: 1rem;">
+          {% for order in orders %}
+            <div class="order-card" style="background: #fff; border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong>Pedido #{{ order.id }}</strong>
+                  <p style="margin: 0.5rem 0; color: #666;">{{ order.date_order|date:"d/m/Y H:i" }}</p>
+                  <p style="margin: 0; color: #666;">Transacción: {{ order.transaction_id }}</p>
+                </div>
+                <div>
+                  {% if order.complete %}
+                    <span class="badge" style="background: #4caf50;">Completado</span>
+                  {% else %}
+                    <span class="badge" style="background: #ff9800;">Pendiente</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: #666; margin-top: 1rem;">No has realizado ningún pedido aún.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Eliminar Producto - Zapatería{% endblock %}
+
+{% block content %}
+<div class="delete-confirm" style="max-width: 600px; margin: 2rem auto;">
+  <h1>Confirmar Eliminación</h1>
+
+  <div style="background: #ffebee; padding: 2rem; border-radius: 8px; border: 2px solid #f44336; margin-top: 1.5rem;">
+    <h2 style="color: #f44336; margin-top: 0;">¿Estás seguro?</h2>
+    <p>Estás a punto de eliminar el siguiente producto:</p>
+
+    <div style="background: #fff; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+      <p><strong>ID:</strong> {{ product.id }}</p>
+      <p><strong>Nombre:</strong> {{ product.name }}</p>
+      <p><strong>Marca:</strong> {{ product.brand|default:"N/A" }}</p>
+      <p><strong>Precio:</strong> Q{{ product.price }}</p>
+      <p><strong>Stock:</strong> {{ product.stock }}</p>
+    </div>
+
+    <p style="color: #d32f2f; font-weight: bold;">Esta acción no se puede deshacer.</p>
+
+    <form method="post" style="margin-top: 2rem;">
+      {% csrf_token %}
+      <div style="display: flex; gap: 1rem;">
+        <button type="submit" class="btn" style="flex: 1; background: #f44336;">
+          Sí, Eliminar Producto
+        </button>
+        <a href="{% url 'gerente_products_list' %}" class="btn btn-outline" style="flex: 1; text-align: center;">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

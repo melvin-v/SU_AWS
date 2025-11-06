@@ -1,0 +1,4 @@
+¡Hola {{ user.first_name|default:user.username }}!¡Tu pedido ha sido confirmado exitosamente!================================
+DETALLES DEL PEDIDO• Número de orden: #{{ order.id }}• Fecha: {{ order.date_ordered|date:"d/m/Y H:i" }}• Total: Q {{ cart.total }}================================
+PRODUCTOS COMPRADOS{% for item in cart.items %}• {{ item.product.name }} (x{{ item.quantity }}) - Q {{ item.subtotal }}{% endfor %}================================
+DIRECCIÓN DE ENVÍO{{ customer.name }}{{ shipping_address.address }}{{ shipping_address.city }}, {{ shipping_address.state }}Código postal: {{ shipping_address.zipcode }}Teléfono: {{ phone }}================================Gracias por confiar en Zapatería. Te notificaremos cuando tu pedido sea despachado.Atentamente,El equipo de Zapatería

@@ -1,0 +1,76 @@
+{% extends "generales/main.html" %}
+
+{% block title %}{% if product %}Editar Producto{% else %}Agregar Producto{% endif %} - Zapatería{% endblock %}
+
+{% block content %}
+<div class="product-form" style="max-width: 800px; margin: 2rem auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>{% if product %}Editar Producto{% else %}Agregar Nuevo Producto{% endif %}</h1>
+    <a href="{% url 'gerente_products_list' %}" class="btn btn-outline">Volver a Lista</a>
+  </div>
+
+  <div style="background: #fff; padding: 2rem; border-radius: 8px; border: 1px solid #ddd;">
+    <form method="post">
+      {% csrf_token %}
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nombre del Producto *</label>
+        <input type="text" name="name" value="{{ product.name|default:'' }}" required
+               style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Marca</label>
+          <input type="text" name="brand" value="{{ product.brand|default:'' }}"
+                 style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Talla</label>
+          <input type="text" name="size" value="{{ product.size|default:'' }}"
+                 placeholder="Ej: 38, 42, M, L"
+                 style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Precio (Q) *</label>
+          <input type="number" name="price" step="0.01" value="{{ product.price|default:'' }}" required
+                 style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Stock *</label>
+          <input type="number" name="stock" value="{{ product.stock|default:'0' }}" required
+                 style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">URL de Imagen</label>
+        <input type="url" name="image_url" value="{{ product.image_url|default:'' }}"
+               placeholder="https://ejemplo.com/imagen.jpg"
+               style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+        <small style="color: #666;">Opcional: URL de la imagen del producto</small>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: flex; align-items: center; cursor: pointer;">
+          <input type="checkbox" name="digital" {% if product.digital %}checked{% endif %}
+                 style="margin-right: 0.5rem;">
+          <span>Producto Digital</span>
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 1rem; padding-top: 1rem; border-top: 1px solid #000;">
+        <button type="submit" class="btn" style="flex: 1;">
+          {% if product %}Guardar Cambios{% else %}Agregar Producto{% endif %}
+        </button>
+        <a href="{% url 'gerente_products_list' %}" class="btn btn-outline" style="flex: 1; text-align: center;color: #666;">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

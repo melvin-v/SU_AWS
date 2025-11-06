@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Pedido</title>
+    <!-- 
+      Estilos en el head para clientes que sí lo soportan, 
+      pero el estilo principal está "inlinado" en el body.
+    -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4;">
+    
+    <table class="container" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 90%; max-width: 600px; margin: 20px auto; border-collapse: collapse;">
+        <!-- Fila del Encabezado (Logo) -->
+        <tr>
+            <td class="header" style="background-color: #173fc2; padding: 30px 20px; text-align: center; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <a href="http://localhost:8000/" target="_blank">
+                    <!-- Logo de GearKicks -->
+                    <img src="https://i.ibb.co/7JcM450X/5.png" alt="Logo de GearKicks" style="max-width: 200px; height: auto; border: 0;">
+                </a>
+            </td>
+        </tr>
+        
+        <!-- Fila del Contenido Principal -->
+        <tr>
+            <td class="main-content" style="background-color: #374057; padding: 30px 25px;">
+                <h1 style="color: #BDC3C7; margin-top: 0; margin-bottom: 15px; font-size: 24px;">¡Gracias por tu compra, {{ user.first_name|default:user.username }}!</h1>
+                <p style="margin-bottom: 15px; font-size: 16px; color: #FDFEFE;">¡Tu pedido ha sido confirmado exitosamente! Ya estamos preparando tus productos para el envío. Puedes ver el estado de tu pedido en cualquier momento en tu cuenta.</p>
+                
+                <p style="text-align: center; margin-bottom: 15px; font-size: 16px;">
+                    <a href="http://localhost:8000/profile/" class="button" target="_blank" style="display: inline-block; background-color: #0056b3; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 15px;">Ver Mi Pedido</a>
+                </p>
+
+                <div class="content-box order-details" style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                    <h2 style="color: #004a99; border-bottom: 2px solid #eeeeee; padding-bottom: 8px; font-size: 18px; margin-top: 0;">Detalles del Pedido</h2>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 5px 0; font-size: 15px;"><strong>Número de Orden:</strong> #{{ order.id }}</li>
+                        <li style="padding: 5px 0; font-size: 15px;"><strong>Fecha:</strong> {{ order.date_order|date:"d/m/Y H:i" }}</li>
+                        <li style="padding: 5px 0; font-size: 15px;"><strong>Total:</strong> <span style="font-weight: bold; color: #004a99;">Q {{ cart.total }}</span></li>
+                    </ul>
+                </div>
+
+                <div class="content-box product-list" style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                    <h2 style="color: #004a99; border-bottom: 2px solid #eeeeee; padding-bottom: 8px; font-size: 18px; margin-top: 0;">Productos Comprados</h2>
+                    
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="list-style: none; padding: 0; margin: 0;">
+                        {% for item in cart.items %}
+                        <tr style="font-size: 15px;">
+                            <td style="padding: 12px 0; color: #444; border-bottom: 1px solid #eee;">
+                                {{ item.product.name }} (x{{ item.quantity }})
+                            </td>
+                            <td style="padding: 12px 0; font-weight: bold; color: #004a99; text-align: right; border-bottom: 1px solid #eee;">
+                                Q {{ item.subtotal }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="content-box shipping-details" style="margin-bottom: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                    <h2 style="color: #004a99; border-bottom: 2px solid #eeeeee; padding-bottom: 8px; font-size: 18px; margin-top: 0;">Dirección de Envío</h2>
+                    <p style="margin-bottom: 0; font-size: 16px;">
+                        <strong>{{ customer.name }}</strong><br>
+                        {{ shipping_address.address }}<br>
+                        {{ shipping_address.city }}, {{ shipping_address.state }}<br>
+                        Código Postal: {{ shipping_address.zipcode }}<br>
+                        Teléfono: {{ phone }}
+                    </p>
+                </div>
+
+                <p style="margin-bottom: 15px; font-size: 16px; color: #FDFEFE;">Te notificaremos nuevamente cuando tu pedido haya sido despachado. ¡Gracias por confiar en <strong>GearKicks</strong>!</p>
+            </td>
+        </tr>
+
+        <!-- Fila del Pie de Página (Datos de la Empresa) -->
+        <tr>
+            <td class="footer" style="background-color: #333333; color: #bbbbbb; padding: 30px 20px; text-align: center; font-size: 13px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                <p style="margin: 5px 0; font-size: 13px;"><strong>GearKicks</strong></p>
+                <p style="margin: 5px 0; font-size: 13px;">
+                    4-32, 22 Avenida, Zona 11, Ciudad de Guatemala, Guatemala
+                </p>
+                <p style="margin: 5px 0; font-size: 13px;">
+                    <a href="tel:+50212345678" style="color: #ffffff; text-decoration: none; font-weight: bold;">Tel: +502 1234 5678</a> | 
+                    <a href="mailto:zapateriagkicks@gmail.com" style="color: #ffffff; text-decoration: none; font-weight: bold;">zapateriagkicks@gmail.com</a>
+                </p>
+                
+                <div class="social-links" style="margin-top: 10px;">
+                    <a href="https://www.facebook.com/amoureuses.vinos/about?locale=es_LA" target="_blank" style="margin: 0 8px; display: inline-block; color: #ffffff; text-decoration: none; font-weight: bold;">
+                        <!-- Icono de FB más compatible -->
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/facebook-new.png" alt="Facebook" style="width: 24px; height: 24px; border: 0;">
+                    </a>
+                    <a href="https://www.instagram.com/sergio.xc__/" target="_blank" style="margin: 0 8px; display: inline-block; color: #ffffff; text-decoration: none; font-weight: bold;">
+                        <!-- Icono de IG más compatible -->
+                        <img src="https://img.icons8.com/ios-filled/50/ffffff/instagram-new.png" alt="Instagram" style="width: 24px; height: 24px; border: 0;">
+                    </a>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 12px; margin-bottom: 5px;">
+                    &copy; {% now "Y" %} GearKicks. Todos los derechos reservados.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

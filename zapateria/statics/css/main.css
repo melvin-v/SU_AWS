@@ -1,0 +1,93 @@
+/* ====== Reset y variables ====== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --bg: #0f172a;        /* slate-900 */
+  --panel: #111827;     /* gray-900 */
+  --muted: #9ca3af;     /* gray-400 */
+  --text: #ffffff;      /* gray-200 */
+  --primary: #1f7aec;   /* azul */
+  --accent: #22c55e;    /* verde */
+  --danger: #ef4444;    /* rojo */
+  --warning: #f59e0b;   /* amarillo */
+}
+html, body { height: 100%; }
+body{
+  background: linear-gradient(180deg, var(--bg), #0b1220 40%);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+}
+
+/* ====== Layout ====== */
+.container{ max-width: 1200px; margin: 0 auto; padding: 1.25rem; }
+.header{
+  position: sticky; top: 0; z-index: 40;
+  background: rgba(15,23,42,0.85); backdrop-filter: blur(6px);
+  border-bottom: 1px solid #1f2937;
+}
+.nav{ display:flex; align-items:center; gap:.75rem; }
+.nav a, .nav button{
+  text-decoration:none; color:var(--text); opacity:.9; padding:.5rem .75rem; border-radius:.5rem;
+}
+.nav a:hover{ background:#1f2937; opacity:1; }
+.brand{ font-weight:700; letter-spacing:.5px; color:#fff; }
+.nav-right{ margin-left:auto; display:flex; align-items:center; gap:.5rem; }
+
+/* ====== Utilidades ====== */
+.btn{
+  display:inline-block; padding:.6rem .9rem; border-radius:.6rem; border:none; cursor:pointer;
+  background: var(--primary); color:white; font-weight:600;
+  transition: transform .06s ease, opacity .2s ease, background .2s ease;
+}
+.btn:hover{ transform: translateY(-1px); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+.btn-outline{ background: transparent; border:1px solid #334155; }
+.btn-danger{ background: var(--danger); }
+.btn-accent{ background: var(--accent); }
+.badge{ font-size:.75rem; padding:.2rem .5rem; border-radius:.5rem; background:#1f2937; color:#cbd5e1; border:1px solid #334155; }
+
+/* ====== Tarjetas de producto ====== */
+.grid{
+  display:grid; gap:1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.card{
+  background: linear-gradient(180deg, #0b1220, #0a1322);
+  border: 1px solid #1f2937; border-radius:1rem; overflow:hidden;
+  display:flex; flex-direction:column; min-height: 320px;
+}
+.card img{ width:100%; height:180px; object-fit:cover; background:#0b1020; }
+.card-body{ padding:1rem; display:flex; flex-direction:column; gap:.5rem; flex:1; }
+.card-title{ font-weight:700; font-size:1.05rem; }
+.card-price{ font-weight:700; color:#d1fae5; }
+.card-footer{ padding: .75rem 1rem; border-top:1px solid #1f2937; display:flex; gap:.5rem; }
+
+/* ====== Tablas (carrito) ====== */
+.table{ width:100%; border-collapse: collapse; }
+.table th, .table td{ padding:.75rem; border-bottom:1px solid #1f2937; text-align:left; }
+.table th{ color:#cbd5e1; font-weight:700; }
+.qty{ width:74px; padding:.35rem .4rem; border:1px solid #334155; border-radius:.5rem; background:#0b1220; color:#e5e7eb; }
+
+/* ====== Formularios (checkout) ====== */
+.form{ display:grid; gap:.9rem; }
+.input, .select, .textarea{
+  width:100%; padding:.65rem .75rem; border-radius:.6rem; border:1px solid #334155;
+  background:#0b1220; color:#e5e7eb;
+}
+.input:focus, .select:focus, .textarea:focus{ outline:none; border-color:#475569; }
+.form-row{ display:grid; gap:.9rem; grid-template-columns:1fr 1fr; }
+label{ font-size:.9rem; color:#cbd5e1; }
+
+/* ====== Mensajes (Django messages) ====== */
+.alert{ padding:.75rem 1rem; border-radius:.6rem; border:1px solid #334155; margin:.5rem 0; }
+.alert-info{ background:#0b1324; }
+.alert-success{ background:#062411; border-color:#14532d; }
+.alert-error{ background:#2a0b0b; border-color:#7f1d1d; }
+
+/* ====== Footer ====== */
+.footer{ margin-top:2rem; padding:2rem 0; color:#9ca3af; border-top:1px solid #1f2937; text-align:center; }
+
+/* ====== Responsivo ====== */
+@media (max-width:720px){
+  .form-row{ grid-template-columns:1fr; }
+  .nav-right{ gap:.25rem; }
+}

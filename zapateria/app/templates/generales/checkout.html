@@ -1,0 +1,112 @@
+{% extends "generales/main.html" %}
+{% block title %}Checkout - Zapatería{% endblock %}
+{% block content %}
+  <h1 style="margin-bottom:1rem">Checkout</h1>
+
+  {% if not user.is_authenticated %}
+    <div class="alert alert-warning">
+      Debes iniciar sesión para completar tu compra.
+      <a class="btn" href="{% url 'login' %}?next={% url 'checkout' %}">Iniciar sesión</a>
+      <a class="btn btn-outline" href="{% url 'register' %}">Crear cuenta</a>
+    </div>
+  {% else %}
+
+  {% if cart.items %}
+  <div class="form-row" style="align-items:start">
+    <!-- Datos de facturación -->
+    <section>
+      <h2 style="margin-bottom:.5rem">Datos de facturación</h2>
+      <form class="form" method="post" action="{% url 'process_order' %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div>
+            <label>Nombres</label>
+            <input class="input" name="first_name" value="{{ user.first_name }}" required>
+          </div>
+          <div>
+            <label>Apellidos</label>
+            <input class="input" name="last_name" value="{{ user.last_name }}" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label>Correo</label>
+            <input class="input" type="email" name="email" value="{{ user.email }}" required>
+          </div>
+          <div>
+            <label>Teléfono</label>
+            <input class="input" type="tel" name="phone" pattern="[0-9\s+()-]{8,}" placeholder="5555-5555" required>
+          </div>
+        </div>
+
+        <div>
+          <label>Dirección de envío</label>
+          <input class="input" name="address" placeholder="Calle, número, zona…" required>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label>Ciudad</label>
+            <input class="input" name="city" required>
+          </div>
+          <div>
+            <label>Código postal</label>
+            <input class="input" name="zip" pattern="[0-9]{4,6}" required>
+          </div>
+        </div>
+
+        <!-- Pago simulado (sólo patrón y required; el cobro real se implementa luego) -->
+        <div class="form-row">
+          <div>
+            <label>Número de tarjeta</label>
+            <input class="input" name="cc" inputmode="numeric" autocomplete="cc-number"
+                   pattern="[0-9]{13,19}" placeholder="4242 4242 4242 4242" required>
+          </div>
+          <div>
+            <label>CVV</label>
+            <input class="input" name="cvv" pattern="[0-9]{3,4}" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Mes</label>
+            <input class="input" name="exp_month" pattern="^(0?[1-9]|1[0-2])$" placeholder="MM" required>
+          </div>
+          <div>
+            <label>Año</label>
+            <input class="input" name="exp_year" pattern="^20[2-9][0-9]$" placeholder="YYYY" required>
+          </div>
+        </div>
+
+        <button class="btn btn-accent" type="submit">Confirmar pedido</button>
+        <a class="btn btn-outline" href="{% url 'cart' %}">Volver al carrito</a>
+      </form>
+    </section>
+
+    <!-- Resumen del pedido -->
+    <aside>
+      <h2 style="margin-bottom:.5rem">Resumen</h2>
+      <table class="table">
+        <thead><tr><th>Producto</th><th>Cant.</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          {% for item in cart.items %}
+            <tr>
+              <td>{{ item.product.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>Q {{ item.subtotal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr><th colspan="2">Total</th><th>Q {{ cart.total }}</th></tr>
+        </tfoot>
+      </table>
+    </aside>
+  </div>
+  {% else %}
+    <p>Tu carrito está vacío. <a href="{% url 'store' %}">Ir a la tienda</a>.</p>
+  {% endif %}
+
+  {% endif %}
+{% endblock %}

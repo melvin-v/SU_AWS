@@ -1,0 +1,80 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Gestión de Productos - Zapatería{% endblock %}
+
+{% block content %}
+<div class="products-management" style="max-width: 1400px; margin: 2rem auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Gestión de Productos</h1>
+    <div>
+      <a href="{% url 'gerente_dashboard' %}" class="btn btn-outline">Dashboard</a>
+      <a href="{% url 'gerente_product_add' %}" class="btn">Agregar Producto</a>
+    </div>
+  </div>
+
+  <!-- Buscador -->
+  <div class="search-bar" style="margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nombre, marca o talla..."
+             style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+      <button type="submit" class="btn">Buscar</button>
+      {% if query %}
+        <a href="{% url 'gerente_products_list' %}" class="btn btn-outline">Limpiar</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Lista de productos -->
+  {% if products %}
+    <div class="products-table" style="background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background: #f5f5f5;">
+          <tr>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd;color: #666;">ID</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd;color: #666;">Nombre</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd;color: #666;">Marca</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd;color: #666;">Talla</th>
+            <th style="padding: 1rem; text-align: right; border-bottom: 2px solid #ddd;color: #666;">Precio</th>
+            <th style="padding: 1rem; text-align: right; border-bottom: 2px solid #ddd;color: #666;">Stock</th>
+            <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #ddd;color: #666;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 1rem;color: #000;">{{ product.id }}</td>
+              <td style="padding: 1rem;color: #000;">
+                <strong>{{ product.name }}</strong>
+                {% if product.digital %}
+                  <span class="badge" style="background: #9c27b0; font-size: 0.75rem;">Digital</span>
+                {% endif %}
+              </td>
+              <td style="padding: 1rem;color: #000;">{{ product.brand|default:"N/A" }}</td>
+              <td style="padding: 1rem;color: #000;">{{ product.size|default:"N/A" }}</td>
+              <td style="padding: 1rem; text-align: right; font-weight: bold;color: #000;">Q{{ product.price }}</td>
+              <td style="padding: 1rem; text-align: right;">
+                {% if product.stock < 5 %}
+                  <strong style="color: #f44336;">{{ product.stock }}</strong>
+                {% else %}
+                  {{ product.stock }}
+                {% endif %}
+              </td>
+              <td style="padding: 1rem; text-align: center;">
+                <a href="{% url 'gerente_product_edit' product.id %}" class="btn btn-outline" style="padding: 0.5rem 1rem; margin-right: 0.5rem;color: #000;">Editar</a>
+                <a href="{% url 'gerente_product_delete' product.id %}" class="btn" style="padding: 0.5rem 1rem; background: #f44336;">Eliminar</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 1rem; color: #333;">Total: {{ products|length }} producto{{ products|length|pluralize }}</p>
+  {% else %}
+    <div style="text-align: center; padding: 3rem; background: #f9f9f9; border-radius: 8px;">
+      <p style="font-size: 1.2rem; color: #666;">No se encontraron productos.</p>
+      <a href="{% url 'gerente_product_add' %}" class="btn" style="margin-top: 1rem;">Agregar el Primer Producto</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

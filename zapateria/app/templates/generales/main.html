@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Zapatería{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+  <header class="header">
+    <div class="container nav">
+      <a href="{% url 'store' %}" class="brand">Zapatería</a>
+      <a href="{% url 'store' %}">Tienda</a>
+      <!-- CAMBIO: Agregar id="cart-count" al badge del carrito -->
+      <a href="{% url 'cart' %}">Carrito <span id="cart-count" class="badge">{{ request.session.cart_count|default:0 }}</span></a>
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+          <span class="badge">Hola, {{ user.username }}</span>
+          <a class="btn btn-outline" href="{% url 'profile' %}">Mi Perfil</a>
+          {% if user.is_superuser %}
+            <a class="btn btn-outline" href="{% url 'admin:index' %}">Admin</a>
+          {% endif %}
+          <a class="btn btn-outline" href="{% url 'logout' %}">Cerrar sesión</a>
+        {% else %}
+          <a class="btn btn-outline" href="{% url 'login' %}">Iniciar sesión</a>
+          <a class="btn" href="{% url 'register' %}">Registrarme</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container">© {{ now|date:"Y" }} Zapatería — Interfaz pensada para ser amigable.</div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Gestión de Órdenes - Zapatería{% endblock %}
+
+{% block content %}
+<div class="orders-management" style="max-width: 1400px; margin: 2rem auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Gestión de Órdenes</h1>
+    <a href="{% url 'gerente_dashboard' %}" class="btn btn-outline">Dashboard</a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters" style="background: #f5f5f5; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+    <form method="get" style="display: grid; grid-template-columns: 2fr 1fr auto auto; gap: 1rem; align-items: end;">
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Buscar</label>
+        <input type="text" name="q" value="{{ query }}" placeholder="ID de transacción, cliente o email..."
+               style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Estado</label>
+        <select name="status" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
+          <option value="">Todos</option>
+          <option value="complete" {% if status == 'complete' %}selected{% endif %}>Completadas</option>
+          <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pendientes</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">Filtrar</button>
+
+      {% if query or status %}
+        <a href="{% url 'gerente_orders_list' %}" class="btn btn-outline">Limpiar</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Lista de órdenes -->
+  {% if orders %}
+    <div class="orders-table" style="background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background: #f5f5f5;">
+          <tr>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd; color: #000;">Orden #</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd; color: #000;">Cliente</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd; color: #000;">Fecha</th>
+            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid #ddd; color: #000;">ID Transacción</th>
+            <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #ddd; color: #000;">Estado</th>
+            <th style="padding: 1rem; text-align: center; border-bottom: 2px solid #ddd; color: #000;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 1rem; color: #000;">
+                <strong>#{{ order.id }}</strong>
+              </td>
+              <td style="padding: 1rem; color: #000;">
+                {% if order.customer %}
+                  {{ order.customer.name }}<br>
+                  <small style="color: #333;">{{ order.customer.email }}</small>
+                {% else %}
+                  <span style="color: #999;">Sin cliente</span>
+                {% endif %}
+              </td>
+              <td style="padding: 1rem; color: #000;">
+                {{ order.date_order|date:"d/m/Y" }}<br>
+                <small style="color: #333;">{{ order.date_order|date:"H:i" }}</small>
+              </td>
+              <td style="padding: 1rem; color: #000;">
+                <code style="background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ order.transaction_id }}</code>
+              </td>
+              <td style="padding: 1rem; text-align: center;">
+                {% if order.complete %}
+                  <span class="badge" style="background: #4caf50;">Completada</span>
+                {% else %}
+                  <span class="badge" style="background: #ff9800;">Pendiente</span>
+                {% endif %}
+              </td>
+              <td style="padding: 1rem; text-align: center;">
+                <a href="{% url 'gerente_order_detail' order.id %}" class="btn btn-outline" style="padding: 0.5rem 1rem; color: #000;">
+                  Ver Detalles
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin-top: 1rem; color: #333;">Total: {{ orders|length }} orden{{ orders|length|pluralize:"es" }}</p>
+  {% else %}
+    <div style="text-align: center; padding: 3rem; background: #f9f9f9; border-radius: 8px;">
+      <p style="font-size: 1.2rem; color: #666;">No se encontraron órdenes con los filtros aplicados.</p>
+      {% if query or status %}
+        <a href="{% url 'gerente_orders_list' %}" class="btn" style="margin-top: 1rem;">Ver Todas las Órdenes</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends "generales/main.html" %}
+{% block title %}Tienda - Zapatería{% endblock %}
+{% block content %}
+  <h1 style="margin-bottom:1rem">Tienda</h1>
+
+  <form method="get" class="form" style="margin-bottom:1rem">
+    <div class="form-row">
+      <input class="input" type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar modelo, marca, color…">
+      <select class="select" name="orden">
+        <option value="">Ordenar…</option>
+        <option value="precio_asc" {% if request.GET.orden == "precio_asc" %}selected{% endif %}>Precio: menor a mayor</option>
+        <option value="precio_desc" {% if request.GET.orden == "precio_desc" %}selected{% endif %}>Precio: mayor a menor</option>
+        <option value="nuevos" {% if request.GET.orden == "nuevos" %}selected{% endif %}>Novedades</option>
+      </select>
+    </div>
+    <div>
+      <button class="btn" type="submit">Aplicar</button>
+      <a class="btn btn-outline" href="{% url 'store' %}">Limpiar</a>
+    </div>
+  </form>
+
+  <section class="grid">
+    {% for product in products %}
+      {% if product.stock > 0 %}
+      <article class="card">
+        <img src="{{ product.image_url }}" alt="Foto de {{ product.name }}">
+        <div class="card-body">
+          <div class="card-title">{{ product.name }}</div>
+          <div class="muted">{{ product.brand }} · Talla {{ product.size }}</div>
+          <div class="card-price">Q {{ product.price }}</div>
+        </div>
+        <div class="card-footer">
+          <!-- BOTÓN MODIFICADO CON AJAX -->
+          <button class="btn btn-add-to-cart" 
+                  data-product-id="{{ product.id }}" 
+                  data-product-name="{{ product.name }}">
+            Agregar al carrito
+          </button>
+          <a class="btn btn-outline" href="{% url 'product_detail' product.id %}">Ver</a>
+        </div>
+      </article>
+      {% else %}
+      <article class="card" aria-disabled="true">
+        <img src="{{ product.image_url }}" alt="Foto de {{ product.name }}">
+        <div class="card-body">
+          <div class="card-title">{{ product.name }}</div>
+          <div class="badge" style="background:#3f1d1d;border-color:#7f1d1d;color:#fecaca">Agotado</div>
+        </div>
+        <div class="card-footer">
+          <button class="btn" disabled>Sin stock</button>
+          <a class="btn btn-outline" href="{% url 'product_detail' product.id %}">Ver</a>
+        </div>
+      </article>
+      {% endif %}
+    {% empty %}
+      <p>No hay productos que coincidan.</p>
+    {% endfor %}
+  </section>
+
+  <!-- AGREGAR ESTE SCRIPT AL FINAL -->
+  <script>
+  // Función para obtener el token CSRF
+  function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+
+  // Función para mostrar notificación
+  function showNotification(message, type = 'success') {
+      // Crear elemento de notificación si no existe
+      let notification = document.getElementById('cart-notification');
+      if (!notification) {
+          notification = document.createElement('div');
+          notification.id = 'cart-notification';
+          notification.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              padding: 15px 20px;
+              border-radius: 4px;
+              color: white;
+              z-index: 1000;
+              font-weight: bold;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+              transition: opacity 0.3s;
+          `;
+          document.body.appendChild(notification);
+      }
+      
+      // Configurar estilo según el tipo
+      if (type === 'success') {
+          notification.style.backgroundColor = '#27ae60';
+      } else {
+          notification.style.backgroundColor = '#e74c3c';
+      }
+      
+      // Mostrar mensaje
+      notification.textContent = message;
+      notification.style.opacity = '1';
+      notification.style.display = 'block';
+      
+      // Ocultar después de 3 segundos
+      setTimeout(() => {
+          notification.style.opacity = '0';
+          setTimeout(() => {
+              notification.style.display = 'none';
+          }, 300);
+      }, 3000);
+  }
+
+  // Agregar event listeners a todos los botones "Agregar al carrito"
+  document.addEventListener('DOMContentLoaded', function() {
+      const addToCartButtons = document.querySelectorAll('.btn-add-to-cart');
+      
+      addToCartButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+              e.preventDefault();
+              
+              const productId = this.getAttribute('data-product-id');
+              const productName = this.getAttribute('data-product-name');
+              
+              // Mostrar indicador de carga
+              const originalText = this.innerHTML;
+              this.innerHTML = 'Agregando...';
+              this.disabled = true;
+              
+              // Hacer solicitud AJAX
+              fetch(`/add-ajax/${productId}/`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'X-Requested-With': 'XMLHttpRequest',
+                      'X-CSRFToken': getCookie('csrftoken')
+                  },
+                  body: `qty=1`
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      // Actualizar contador del carrito
+                      const cartCountElement = document.querySelector('.cart-count');
+                      if (cartCountElement) {
+                          cartCountElement.textContent = data.cart_count;
+                      }
+                      
+                      // Mostrar notificación
+                      showNotification(data.message);
+                  } else {
+                      showNotification('Error al agregar al carrito', 'error');
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  showNotification('Error de conexión', 'error');
+              })
+              .finally(() => {
+                  // Restaurar botón
+                  this.innerHTML = originalText;
+                  this.disabled = false;
+              });
+          });
+      });
+  });
+  </script>
+
+  <!-- Estilos adicionales -->
+  <style>
+  .cart-count {
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      margin-left: 5px;
+  }
+
+  .btn-add-to-cart {
+      transition: all 0.3s ease;
+  }
+
+  .btn-add-to-cart:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+  }
+  </style>
+{% endblock %}

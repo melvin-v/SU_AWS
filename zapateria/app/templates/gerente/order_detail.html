@@ -1,0 +1,132 @@
+{% extends "generales/main.html" %}
+
+{% block title %}Orden #{{ order.id }} - Zapatería{% endblock %}
+
+{% block content %}
+<div class="order-detail" style="max-width: 1000px; margin: 2rem auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Detalles de Orden #{{ order.id }}</h1>
+    <a href="{% url 'gerente_orders_list' %}" class="btn btn-outline">Volver a Lista</a>
+  </div>
+
+  <!-- Estado y acciones -->
+  <div style="background: {{ '#e8f5e9' if order.complete else '#fff3e0' }}; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="margin: 0 0 0.5rem 0;">Estado de la Orden</h3>
+        <p style="margin: 0;">
+          {% if order.complete %}
+            <span class="badge" style="background: #4caf50; font-size: 1rem;">Completada</span>
+          {% else %}
+            <span class="badge" style="background: #ff9800; font-size: 1rem;">Pendiente</span>
+          {% endif %}
+        </p>
+      </div>
+      <div>
+        <form method="post" action="{% url 'gerente_order_update_status' order.id %}">
+          {% csrf_token %}
+          {% if order.complete %}
+            <input type="hidden" name="status" value="pending">
+            <button type="submit" class="btn" style="background: #ff9800;">Marcar como Pendiente</button>
+          {% else %}
+            <input type="hidden" name="status" value="complete">
+            <button type="submit" class="btn" style="background: #4caf50;">Marcar como Completada</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de la orden -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Información del cliente -->
+    <div style="background: #fff; border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px;">
+      <h3 style="margin: 0 0 1rem 0; border-bottom: 2px solid #1976d2; padding-bottom: 0.5rem;">Información del Cliente</h3>
+      {% if order.customer %}
+        <p><strong>Nombre:</strong> {{ order.customer.name }}</p>
+        <p><strong>Email:</strong> {{ order.customer.email }}</p>
+        {% if order.customer.user %}
+          <p><strong>Usuario:</strong> {{ order.customer.user.username }}</p>
+        {% endif %}
+      {% else %}
+        <p style="color: #999;">Sin información del cliente</p>
+      {% endif %}
+    </div>
+
+    <!-- Información de la orden -->
+    <div style="background: #fff; border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px;">
+      <h3 style="margin: 0 0 1rem 0; border-bottom: 2px solid #1976d2; padding-bottom: 0.5rem;">Información de la Orden</h3>
+      <p><strong>ID de Orden:</strong> #{{ order.id }}</p>
+      <p><strong>Fecha:</strong> {{ order.date_order|date:"d/m/Y H:i" }}</p>
+      <p><strong>ID de Transacción:</strong><br>
+        <code style="background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 3px;">{{ order.transaction_id }}</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- Dirección de envío -->
+  {% if shipping %}
+    <div style="background: #fff; border: 1px solid #ddd; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+      <h3 style="margin: 0 0 1rem 0; border-bottom: 2px solid #1976d2; padding-bottom: 0.5rem;">Dirección de Envío</h3>
+      <p><strong>Dirección:</strong> {{ shipping.address }}</p>
+      <p><strong>Ciudad:</strong> {{ shipping.city }}</p>
+      <p><strong>Departamento:</strong> {{ shipping.state }}</p>
+      <p><strong>Código Postal:</strong> {{ shipping.zipcode }}</p>
+    </div>
+  {% endif %}
+
+  <!-- Items de la orden -->
+  <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+    <h3 style="margin: 0; padding: 1.5rem; border-bottom: 2px solid #1976d2;">Items de la Orden</h3>
+
+    {% if order_items %}
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background: #f5f5f5;">
+          <tr>
+            <th style="padding: 1rem; text-align: left; border-bottom: 1px solid #ddd;">Producto</th>
+            <th style="padding: 1rem; text-align: center; border-bottom: 1px solid #ddd;">Cantidad</th>
+            <th style="padding: 1rem; text-align: right; border-bottom: 1px solid #ddd;">Precio Unit.</th>
+            <th style="padding: 1rem; text-align: right; border-bottom: 1px solid #ddd;">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order_items %}
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 1rem; color: #000;">
+                {% if item.product %}
+                  <strong>{{ item.product.name }}</strong><br>
+                  <small style="color: #333;">
+                    {% if item.product.brand %}{{ item.product.brand }} | {% endif %}
+                    {% if item.product.size %}Talla: {{ item.product.size }}{% endif %}
+                  </small>
+                {% else %}
+                  <span style="color: #999;">Producto eliminado</span>
+                {% endif %}
+              </td>
+              <td style="padding: 1rem; text-align: center; color: #000;">{{ item.quantity }}</td>
+              <td style="padding: 1rem; text-align: right; color: #000;">
+                {% if item.product %}Q{{ item.product.price }}{% else %}N/A{% endif %}
+              </td>
+              <td style="padding: 1rem; text-align: right; font-weight: bold; color: #000;">
+                {% if item.product %}Q{{ item.get_total|floatformat:2 }}{% else %}N/A{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot style="background: #f5f5f5;">
+          <tr>
+            <td colspan="3" style="padding: 1rem; text-align: right; font-weight: bold; border-top: 2px solid #ddd;">
+              <span style="color: #000;">TOTAL:</span>
+            </td>
+            <td style="padding: 1rem; text-align: right; font-weight: bold; font-size: 1.2rem; border-top: 2px solid #ddd; color: #000;">
+              Q{{ order.get_cart_total|floatformat:2 }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    {% else %}
+      <p style="padding: 2rem; text-align: center; color: #666;">No hay items en esta orden</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

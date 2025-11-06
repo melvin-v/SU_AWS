@@ -1,0 +1,52 @@
+{% extends "generales/main.html" %}
+{% block title %}Carrito - Zapatería{% endblock %}
+{% block content %}
+  <h1 style="margin-bottom:1rem">Tu Carrito</h1>
+
+  {% if cart.items %}
+    <form method="post" action="{% url 'update_cart' %}">
+      {% csrf_token %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Talla</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items %}
+          <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.product.size }}</td>
+            <td>Q {{ item.product.price }}</td>
+            <td>
+              <input class="qty" type="number" min="1" max="{{ item.product.stock }}" name="qty_{{ item.product.id }}" value="{{ item.quantity }}">
+            </td>
+            <td>Q {{ item.subtotal }}</td>
+            <td>
+              <a class="btn btn-danger" href="{% url 'remove_from_cart' item.product.id %}">Eliminar</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap">
+        <div>
+          <div class="badge">Artículos: {{ cart.count }}</div>
+          <div class="badge">Total: Q {{ cart.total }}</div>
+        </div>
+        <div>
+          <button class="btn btn-outline" type="submit">Actualizar cantidades</button>
+          <a class="btn" href="{% url 'checkout' %}">Proceder al pago</a>
+        </div>
+      </div>
+    </form>
+  {% else %}
+    <p>Tu carrito está vacío. <a href="{% url 'store' %}">Ir a la tienda</a>.</p>
+  {% endif %}
+{% endblock %}
